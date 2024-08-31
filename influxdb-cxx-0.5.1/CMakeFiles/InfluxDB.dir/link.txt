@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC  -Wall -pedantic -Wextra -O2 -g -DNDEBUG  -shared -Wl,-soname,libInfluxDB.so -o lib/libInfluxDB.so CMakeFiles/InfluxDB.dir/src/InfluxDB.cxx.o CMakeFiles/InfluxDB.dir/src/Point.cxx.o CMakeFiles/InfluxDB.dir/src/InfluxDBFactory.cxx.o CMakeFiles/InfluxDB.dir/src/HTTP.cxx.o  /usr/lib/x86_64-linux-gnu/libcurl.so 
