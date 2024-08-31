@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package resdb;
+
+import "proto/signature_info.proto";
+
+message ReplicaInfo {
+    int64 id = 1;
+    optional string ip = 2;
+    optional int32 port = 3;
+    optional CertificateInfo certificate_info = 4; // include the private/public key, public key of admin and the certificate published by admin.
+}
+
+
+message ReplicaStates {
+  repeated ReplicaState state = 1;
+}
+
+message ReplicaState {
+  int64 view = 1;
+  ReplicaInfo replica_info = 2;
+}

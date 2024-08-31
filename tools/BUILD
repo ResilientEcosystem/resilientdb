@@ -1,29 +1,10 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "key_generator_tools",
     srcs = ["key_generator_tools.cpp"],
     deps = [
-        "//common/crypto:key_generator",
+        "//crypto:key_generator",
     ],
 )
 
@@ -31,8 +12,8 @@ cc_binary(
     name = "certificate_tools",
     srcs = ["certificate_tools.cpp"],
     deps = [
-        "//common/crypto:key_generator",
-        "//common/crypto:signature_verifier",
+        "//crypto:key_generator",
+        "//crypto:signature_verifier",
     ],
 )
 
@@ -40,40 +21,34 @@ cc_binary(
     name = "certificate_tools_test",
     srcs = ["certificate_tools_test.cpp"],
     deps = [
-        "//common/crypto:signature_verifier",
+        "//crypto:signature_verifier",
     ],
 )
 
 cc_binary(
-    name = "resdb_state_accessor_tools",
-    srcs = ["resdb_state_accessor_tools.cpp"],
+    name = "resdb_status_client_tools",
+    srcs = ["resdb_status_client_tools.cpp"],
     deps = [
-        "//interface/common:resdb_state_accessor",
-        "//platform/config:resdb_config_utils",
+        "//client:resdb_state_client",
+        "//config:resdb_config_utils",
     ],
 )
 
 cc_binary(
-    name = "resdb_txn_accessor_tools",
-    srcs = ["resdb_txn_accessor_tools.cpp"],
+    name = "resdb_txn_client_tools",
+    srcs = ["resdb_txn_client_tools.cpp"],
     deps = [
-        "//interface/common:resdb_txn_accessor",
-        "//platform/config:resdb_config_utils",
+        "//client:resdb_txn_client",
+        "//config:resdb_config_utils",
     ],
 )
 
-py_binary(
-    name = "generate_region_config",
-    srcs = ["generate_region_config.py"],
+cc_binary(
+    name = "kv_client_txn_tools",
+    srcs = ["kv_client_txn_tools.cpp"],
     deps = [
-        "//platform/proto:replica_info_py_proto",
-    ],
-)
-
-py_binary(
-    name = "generate_mulregion_config",
-    srcs = ["generate_mulregion_config.py"],
-    deps = [
-        "//platform/proto:replica_info_py_proto",
+        "//client:resdb_txn_client",
+        "//config:resdb_config_utils",
+        "//proto:kv_server_cc_proto",
     ],
 )

@@ -1,0 +1,7 @@
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/install/strip.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/install/local.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/install.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/list_install_components.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/edit_cache.dir
+/home/ubuntu/nexres/influxdb-cxx-0.5.1/CMakeFiles/InfluxDB.dir

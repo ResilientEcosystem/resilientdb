@@ -1,22 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 #include "common/utils/utils.h"
 
 #include <stdlib.h>
@@ -27,10 +8,34 @@ namespace resdb {
 #define CPU_FREQ 2.2
 #define TIME_ENABLE true
 
-uint64_t GetCurrentTime() {
+uint64_t get_server_clock() {
+#if defined(__i386__)
+  uint64_t ret;
+  __asm__ __volatile__("rdtsc" : "=A"(ret));
+#elif defined(__x86_64__)
+  unsigned hi, lo;
+  __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
+  uint64_t ret = ((uint64_t)lo) | (((uint64_t)hi) << 32);
+  ret = (uint64_t)((double)ret / CPU_FREQ);
+#else
+  timespec *tp = new timespec;
+  clock_gettime(CLOCK_REALTIME, tp);
+  uint64_t ret = tp->tv_sec * 1000000000 + tp->tv_nsec;
+  delete tp;
+#endif
+  return ret;
+}
+
+uint64_t get_sys_clock() {
+  if (TIME_ENABLE) return get_server_clock();
+  return 0;
+}
+
+uint64_t get_current_time() {
   struct timeval tv;
-  gettimeofday(&tv, nullptr);
-  return (uint64_t)(tv.tv_sec) * 1000000 + tv.tv_usec;
+  struct timezone tz;
+  gettimeofday(&tv, &tz);
+  return static_cast<uint64_t>(tv.tv_sec) * 1000000000ll + tv.tv_usec;
 }
 
 }  // namespace resdb

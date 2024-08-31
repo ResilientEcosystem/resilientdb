@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+set(InfluxDB_VERSION @PROJECT_VERSION@)
+
+get_filename_component(InfluxDB_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+find_dependency(Boost)
+find_dependency(CURL)
+
+if(NOT TARGET InfluxData::InfluxDB)
+  include("${InfluxDB_CMAKE_DIR}/InfluxDBTargets.cmake")
+endif()
+
+message(STATUS "InfluxDB ${InfluxDB_VERSION} found")

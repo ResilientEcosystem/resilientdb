@@ -1,0 +1,7 @@
+package(default_visibility = ["//test:__pkg__"])
+
+filegroup(
+    name = "test_data",
+    srcs = glob(["*"]),
+    #srcs = glob(['server.config'])
+)

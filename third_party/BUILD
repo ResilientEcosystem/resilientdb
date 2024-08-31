@@ -1,31 +1,39 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make", "make")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make", "make", "cmake")
+
+cc_library(
+    name = "rocksdb",
+    deps = [
+        "@com_github_facebook_rocksdb//:rocksdb",
+    ],
+)
 
 cc_library(
     name = "prometheus",
     deps = [
-        "@com_github_jupp0r_prometheus_cpp//:prometheus",
+        "@com_github_jupp0r_prometheus_cpp//pull",
     ],
+)
+
+configure_make(
+    name = "jemalloc",
+    autogen = True,
+    configure_in_place = True,
+    configure_options = [
+        #    "--enable-prof",
+    ],
+    copts = [
+        "-Wsign-compare",
+    ],
+    lib_source = "@com_jemalloc//:all_srcs",
+    out_static_libs = ["libjemalloc.a"],
+    targets = [
+        "build_lib_static",
+        "install_lib",
+        "install_include",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -35,6 +43,12 @@ cc_library(
     ],
 )
 
+make(
+    name = "zstd",
+    lib_source = "@com_facebook_zstd//:all_srcs",
+    out_static_libs = ["libzstd.a"],
+)
+
 cc_library(
     name = "leveldb",
     deps = [
@@ -42,18 +56,16 @@ cc_library(
     ],
 )
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 cc_library(
-    name = "evm_lib",
+    name = "cryptopp_lib",
     deps = [
-        "@eEVM",
+        ":cryptopp",
     ],
 )
 
-cc_library(
-    name = "crow",
-    deps = [
-        "@com_crowcpp_crow//:crow",
-    ],
+cmake(
+    name = "influxdb",
+    lib_source = "@com_github_influxdb_cxx//:all_srcs",
+    out_static_libs = ["libInfluxDB.so"],
 )

@@ -1,15 +1,13 @@
-workspace(name = "com_resdb_nexres")
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//:repositories.bzl", "nexres_repositories")
-
-nexres_repositories()
 
 http_archive(
     name = "rules_foreign_cc",
-    sha256 = "69023642d5781c68911beda769f91fcbc8ca48711db935a75da7f6536b65047f",
-    strip_prefix = "rules_foreign_cc-0.6.0",
-    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
+    # TODO: Get the latest sha256 value from a bazel debug message or the latest
+    #       release on the releases page: https://github.com/bazelbuild/rules_foreign_cc/releases
+    #
+    # sha256 = "...",
+    strip_prefix = "rules_foreign_cc-50ee9979e60e8db38e10de45d2c60873a210bf55",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/50ee9979e60e8db38e10de45d2c60873a210bf55.tar.gz",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
@@ -32,29 +30,22 @@ rules_proto_dependencies()
 
 rules_proto_toolchains()
 
-http_archive(
-    name = "rules_python",
-    sha256 = "ffc7b877c95413c82bfd5482c017edcf759a6250d8b24e82f41f3c8b8d9e287e",
-    strip_prefix = "rules_python-0.19.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.19.0/rules_python-0.19.0.tar.gz",
-)
-
-load("@rules_python//python:pip.bzl", "pip_install")
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-rules_proto_dependencies()
-
-rules_proto_toolchains()
-
-load("@rules_proto_grpc//:repositories.bzl", "rules_proto_grpc_repos", "rules_proto_grpc_toolchains")
-
-rules_proto_grpc_toolchains()
-
-rules_proto_grpc_repos()
-
 bind(
     name = "gtest",
     actual = "@com_google_googletest//:gtest",
+)
+
+http_archive(
+    name = "com_google_googletest",
+    strip_prefix = "googletest-609281088cfefc76f9d0ce82e1ff6c30cc3591e5",
+    urls = ["https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip"],
+)
+
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "34af2f15cf7367513b352bdcd2493ab14ce43692d2dcd9dfc499492966c64dcf",
+    strip_prefix = "gflags-2.2.2",
+    urls = ["https://github.com/gflags/gflags/archive/v2.2.2.tar.gz"],
 )
 
 bind(
@@ -69,19 +60,20 @@ http_archive(
     urls = ["https://github.com/google/glog/archive/v0.5.0.zip"],
 )
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+all_content = """filegroup(name = "all_srcs", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
 
-git_repository(
-    name = "com_google_protobuf",
-    remote = "https://github.com/protocolbuffers/protobuf",
-    tag = "v3.10.0",
+http_archive(
+    name = "cryptopp",
+    build_file_content = all_content,
+    strip_prefix = "cryptopp-CRYPTOPP_8_6_0",
+    urls = ["https://github.com/weidai11/cryptopp/archive/refs/tags/CRYPTOPP_8_6_0.zip"],
 )
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
-
-all_content = """filegroup(name = "all_srcs", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
+http_archive(
+    name = "com_google_absl",
+    strip_prefix = "abseil-cpp-20211102.0",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20211102.0.zip"],
+)
 
 # buildifier is written in Go and hence needs rules_go to be built.
 # See https://github.com/bazelbuild/rules_go for the up to date setup instructions.
@@ -100,7 +92,7 @@ go_rules_dependencies()
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains")
 
-go_register_toolchains(version = "1.19.5")
+go_register_toolchains(version = "1.17.2")
 
 http_archive(
     name = "bazel_gazelle",
@@ -125,24 +117,25 @@ http_archive(
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+_RULES_BOOST_COMMIT = "652b21e35e4eeed5579e696da0facbe8dba52b1f"
+
+http_archive(
+    name = "com_github_nelhage_rules_boost",
+    sha256 = "c1b8b2adc3b4201683cf94dda7eef3fc0f4f4c0ea5caa3ed3feffe07e1fb5b15",
+    strip_prefix = "rules_boost-%s" % _RULES_BOOST_COMMIT,
+    urls = [
+        "https://github.com/nelhage/rules_boost/archive/%s.tar.gz" % _RULES_BOOST_COMMIT,
+    ],
+)
+
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
 
 http_archive(
-    name = "net_zlib_zlib",
-    build_file = "@com_resdb_nexres//third_party:z.BUILD",
-    sha256 = "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9",
-    strip_prefix = "zlib-1.2.12",
-    urls = [
-        "https://zlib.net/zlib-1.2.12.tar.gz",
-        "https://storage.googleapis.com/bazel-mirror/zlib.net/zlib-1.2.12.tar.gz",
-    ],
-)
-
-http_archive(
     name = "com_google_leveldb",
-    build_file = "@com_resdb_nexres//third_party:leveldb.BUILD",
+    build_file = "//third_party:leveldb.BUILD",
     sha256 = "a6fa7eebd11de709c46bf1501600ed98bf95439d6967963606cc964931ce906f",
     strip_prefix = "leveldb-1.23",
     url = "https://github.com/google/leveldb/archive/refs/tags/1.23.zip",
@@ -155,7 +148,7 @@ bind(
 
 http_archive(
     name = "com_google_snappy",
-    build_file = "@com_resdb_nexres//third_party:snappy.BUILD",
+    build_file = "//third_party:snappy.BUILD",
     sha256 = "e170ce0def2c71d0403f5cda61d6e2743373f9480124bcfcd0fa9b3299d428d9",
     strip_prefix = "snappy-1.1.9",
     url = "https://github.com/google/snappy/archive/refs/tags/1.1.9.zip",
@@ -168,58 +161,73 @@ bind(
 
 http_archive(
     name = "com_zlib",
-    build_file = "@com_resdb_nexres//third_party:zlib.BUILD",
+    build_file = "//third_party:zlib.BUILD",
     sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
     strip_prefix = "zlib-1.2.11",
     url = "https://github.com/madler/zlib/archive/v1.2.11.tar.gz",
 )
 
-http_archive(
-    name = "pybind11_bazel",
-    strip_prefix = "pybind11_bazel-2.11.1.bzl.1",
-    urls = ["https://github.com/pybind/pybind11_bazel/archive/refs/tags/v2.11.1.bzl.1.zip"],
+bind(
+    name = "zstd",
+    actual = "//third_party:zstd",
 )
 
 http_archive(
-    name = "pybind11",
-    build_file = "@pybind11_bazel//:pybind11.BUILD",
-    sha256 = "8ff2fff22df038f5cd02cea8af56622bc67f5b64534f1b83b9f133b8366acff2",
-    strip_prefix = "pybind11-2.6.2",
-    urls = ["https://github.com/pybind/pybind11/archive/v2.6.2.tar.gz"],
-)
-
-load("@pybind11_bazel//:python_configure.bzl", "python_configure")
-
-python_configure(
-    name = "local_config_python",
-    python_version = "3",
-)
-
-http_archive(
-    name = "nlohmann_json",
-    build_file = "@com_resdb_nexres//third_party:json.BUILD",  # see below
-    sha256 = "4cf0df69731494668bdd6460ed8cb269b68de9c19ad8c27abc24cd72605b2d5b",
-    strip_prefix = "json-3.9.1",
-    urls = ["https://github.com/nlohmann/json/archive/v3.9.1.tar.gz"],
-)
-
-http_archive(
-    name = "com_crowcpp_crow",
-    build_file = "//third_party:crow.BUILD",
-    sha256 = "f95128a8976fae6f2922823e07da59edae277a460776572a556a4b663ff5ee4b",
-    strip_prefix = "Crow-1.0-5",
-    url = "https://github.com/CrowCpp/Crow/archive/refs/tags/v1.0+5.zip",
+    name = "com_facebook_zstd",
+    build_file_content = all_content,
+    strip_prefix = "zstd-1.5.2",
+    url = "https://github.com/facebook/zstd/archive/refs/tags/v1.5.2.zip",
 )
 
 bind(
-    name = "asio",
-    actual = "@com_chriskohlhoff_asio//:asio",
+    name = "jemalloc",
+    actual = "//third_party:jemalloc",
 )
 
 http_archive(
-    name = "com_chriskohlhoff_asio",
-    build_file = "//third_party:asio.BUILD",
-    sha256 = "babcdfd2c744905a73d20de211b51367bda0d5200f11d654c4314b909d8c963c",
-    strip_prefix = "asio-asio-1-26-0",
-    url = "https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-26-0.zip",
+    name = "com_jemalloc",
+    build_file_content = all_content,
+    sha256 = "1f35888bad9fd331f5a03445bc1bff808a59378be61fef01e9736179d76f2fab",
+    strip_prefix = "jemalloc-5.3.0",
+    url = "https://github.com/jemalloc/jemalloc/archive/refs/tags/5.3.0.zip",
 )
+
+http_archive(
+    name = "com_github_facebook_rocksdb",
+    build_file = "//third_party:rocksdb.BUILD",
+    sha256 = "928cbd416c0531e9b2e7fa74864ce0d7097dca3f5a8c31f31459772a28dbfcba",
+    strip_prefix = "rocksdb-7.2.2",
+    url = "https://github.com/facebook/rocksdb/archive/refs/tags/v7.2.2.zip",
+)
+
+http_archive(
+    name = "net_zlib_zlib",
+    build_file = "//third_party:z.BUILD",
+    sha256 = "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9",
+    strip_prefix = "zlib-1.2.12",
+    urls = [
+        "https://zlib.net/zlib-1.2.12.tar.gz",
+        "https://storage.googleapis.com/bazel-mirror/zlib.net/zlib-1.2.12.tar.gz",
+    ],
+)
+
+
+http_archive(
+    name = "com_github_jupp0r_prometheus_cpp",
+    sha256 = "281b6d9a26da35375c9958954e03616d71ea28d57ec193b0e75c3e10ff3da55d",
+    strip_prefix = "prometheus-cpp-1.0.1",
+    url = "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.0.1.zip",
+)
+
+load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
+
+prometheus_cpp_repositories()
+
+
+http_archive(
+    name = "com_github_influxdb_cxx",
+    build_file_content = all_content,
+    strip_prefix = "influxdb-cxx-0.5.1",
+    url = "https://github.com/awegrzyn/influxdb-cxx/archive/refs/tags/v0.5.1.zip"
+)
+
